@@ -6,8 +6,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.dependencies import get_current_user, require_role
 from app.database import get_db
-from app.models.appointment import Appointment, AppointmentType
-from app.models.user import User, UserRole
+from backend.app.models.consulta import Consulta, TipoConsulta
+from backend.app.models.usuario import Usuario, PerfilAcesso
 from app.schemas.appointment import AppointmentCreate, AppointmentRead, AppointmentStatusUpdate
 
 router = APIRouter(prefix="/appointments", tags=["Consultas"])
@@ -16,16 +16,16 @@ router = APIRouter(prefix="/appointments", tags=["Consultas"])
 @router.post("", response_model=AppointmentRead, status_code=201)
 async def create_appointment(
     payload: AppointmentCreate,
-    current_user: User = Depends(require_role(UserRole.PATIENT)),
+    current_user: Usuario = Depends(require_role(PerfilAcesso.PACIENTE)),
     db: AsyncSession = Depends(get_db),
 ):
-    if payload.appointment_type == AppointmentType.IN_PERSON and not payload.location:
+    if payload.consulta_type == TipoConsulta.PESSOAL and not payload.local:
         raise HTTPException(status_code=400, detail="Consulta presencial exige um local")
 
-    appointment = Appointment(
-        patient_id=current_user.id,
-        nutritionist_id=payload.nutritionist_id,
-        appointment_type=payload.appointment_type,
+    consulta = Consulta(
+        paciente_id=current_user.id,
+        nutricionista_id=payload.nutricionista_id,
+        consulta_type=payload.consulta_type,
         scheduled_at=payload.scheduled_at,
         duration_minutes=payload.duration_minutes,
         location=payload.location,
@@ -33,23 +33,23 @@ async def create_appointment(
         # video_call_url é gerado depois, ex: via integração com serviço de videochamada,
         # ao confirmar a consulta
     )
-    db.add(appointment)
+    db.add(consulta)
     await db.commit()
-    await db.refresh(appointment)
-    return appointment
+    await db.refresh(consulta)
+    return consulta
 
 
 @router.get("/mine", response_model=list[AppointmentRead])
 async def list_my_appointments(
-    current_user: User = Depends(get_current_user),
+    current_user: Usuario = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    if current_user.role == UserRole.PATIENT:
-        stmt = select(Appointment).where(Appointment.patient_id == current_user.id)
+    if current_user.role == PerfilAcesso.PACIENTE:
+        stmt = select(Consulta).where(Consulta.paciente_id == current_user.id)
     else:
-        stmt = select(Appointment).where(Appointment.nutritionist_id == current_user.id)
+        stmt = select(Consulta).where(Consulta.nutricionista_id == current_user.id)
 
-    result = await db.execute(stmt.order_by(Appointment.scheduled_at))
+    result = await db.execute(stmt.order_by(Consulta.scheduled_at))
     return result.scalars().all()
 
 
@@ -57,16 +57,16 @@ async def list_my_appointments(
 async def update_appointment_status(
     appointment_id: uuid.UUID,
     payload: AppointmentStatusUpdate,
-    current_user: User = Depends(require_role(UserRole.NUTRITIONIST)),
+    current_user: Usuario = Depends(require_role(PerfilAcesso.NUTRICIONISTA)),
     db: AsyncSession = Depends(get_db),
 ):
-    result = await db.execute(select(Appointment).where(Appointment.id == appointment_id))
-    appointment = result.scalar_one_or_none()
+    result = await db.execute(select(Consulta).where(Consulta.id == appointment_id))
+    consulta = result.scalar_one_or_none()
 
-    if not appointment or appointment.nutritionist_id != current_user.id:
+    if not consulta or consulta.nutricionista_id != current_user.id:
         raise HTTPException(status_code=404, detail="Consulta não encontrada")
 
-    appointment.status = payload.status
+    consulta.status = payload.status
     await db.commit()
-    await db.refresh(appointment)
-    return appointment
+    await db.refresh(consulta)
+    return consulta

@@ -3,7 +3,7 @@ from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict
 
-from app.models.diet import DietGoal
+from backend.app.models.dieta import DietGoal
 
 
 class PlannedMealCreate(BaseModel):

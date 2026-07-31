@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.security import create_access_token, hash_password, verify_password
 from app.database import get_db
-from app.models.user import User, PatientProfile, NutritionistProfile, UserRole
+from Backend.app.models.usuario import User, PatientProfile, NutritionistProfile, UserRole
 from app.schemas.user import UserCreate, UserRead, Token, LoginRequest
 
 router = APIRouter(prefix="/auth", tags=["Autenticação"])

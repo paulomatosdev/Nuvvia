@@ -7,8 +7,8 @@ from sqlalchemy.orm import selectinload
 
 from app.auth.dependencies import get_current_user, require_role
 from app.database import get_db
-from app.models.diet import DietPlan, PlannedMeal
-from app.models.user import User, UserRole
+from backend.app.models.dieta import DietPlan, PlannedMeal
+from Backend.app.models.usuario import User, UserRole
 from app.schemas.diet import DietPlanCreate, DietPlanRead
 
 router = APIRouter(prefix="/diets", tags=["Dietas"])

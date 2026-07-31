@@ -1,15 +1,15 @@
 from app.database import Base
-from app.models.user import User, PatientProfile, NutritionistProfile, UserRole
-from app.models.appointment import Appointment, AppointmentType, AppointmentStatus
-from app.models.exam import Exam
-from app.models.diet import DietPlan, PlannedMeal, DietGoal
-from app.models.meal_log import MealLog, MealLogSource
+from backend.app.models.usuario import Usuario, PacientePerfil, NutricionistaPerfil, PerfilAcesso
+from backend.app.models.consulta import Consulta, TipoConsulta, StatusConsulta
+from backend.app.models.exame import Exame
+from app.models.dieta import RotinaAlimentar, PlanoAlimentar, DietaMeta
+from backend.app.models.registro_alimentar import RegistroAlimentar, FonteRegistro
 
 __all__ = [
     "Base",
-    "User", "PatientProfile", "NutritionistProfile", "UserRole",
-    "Appointment", "AppointmentType", "AppointmentStatus",
-    "Exam",
-    "DietPlan", "PlannedMeal", "DietGoal",
-    "MealLog", "MealLogSource",
+    "Usuario", "PacientePerfil", "NutricionistaPerfil", "PerfilAcesso",
+    "Consulta", "TipoConsulta", "StatusConsulta",
+    "Exame",
+    "RotinaAlimentar", "PlanoAlimentar", "DietaMeta",
+    "RegistroAlimentar", "FonteRegistro",
 ]

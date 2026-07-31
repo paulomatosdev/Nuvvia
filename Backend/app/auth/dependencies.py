@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.security import decode_access_token
 from app.database import get_db
-from app.models.user import User, UserRole
+from Backend.app.models.usuario import User, UserRole
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 

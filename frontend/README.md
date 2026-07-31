@@ -1,87 +1,92 @@
-# VittaNutricion
+# Prato Certo — Painel do Nutricionista (Frontend Web)
 
-Interface web desenvolvida com **Next.js**, **TypeScript** e **Tailwind CSS** para gerenciamento da rotina do nutricionista. O painel centraliza consultas, pacientes, dietas e exames em uma interface moderna, intuitiva e otimizada para uso em computadores.
+Frontend web em **Next.js + TypeScript + Tailwind** para o painel do
+nutricionista. O projeto está orientado para desktop/PC — o paciente
+usa o app mobile.
 
----
+## Identidade visual
 
-## Funcionalidades
+- **Paleta**: fundo branco-sálvia, verde-floresta como cor de marca e
+tres cores de dados para os macros — ameixa (proteína), mostarda
+(carboidrato) e verde-azulado (gordura).
+- **Tipografia**: Fraunces para títulos e IBM Plex Sans para texto e dados.
+- **Elemento de assinatura**: o anel de prato (`components/PlateRing.tsx`),
+um componente visual que representa o progresso dos macros do dia.
 
-* Autenticação integrada ao backend.
-* Dashboard com visão geral da agenda e pacientes.
-* Gerenciamento de consultas.
-* Listagem e acompanhamento de pacientes.
-* Visualização de dietas e exames.
-* Estrutura preparada para integração completa com a API.
+## Estrutura
 
----
-
-## Tecnologias
-
-* Next.js
-* TypeScript
-* Tailwind CSS
-* React
-* Axios
-
----
-
-## Estrutura do Projeto
-
-```text
+```
 app/
-├── login/
-├── dashboard/
-├── agenda/
+├── login/page.tsx           # tela de login
+├── dashboard/page.tsx        # visão geral: agenda do dia + pacientes que precisam de atenção
+├── agenda/page.tsx           # lista de consultas agrupadas por dia
 └── pacientes/
+    ├── page.tsx               # lista de pacientes (mock)
+    └── [id]/page.tsx           # detalhe do paciente (mock)
 
 components/
-├── AppShell.tsx
-├── PlateRing.tsx
+├── AppShell.tsx        # navegação lateral + estrutura das páginas internas
+├── PlateRing.tsx       # elemento de assinatura (anel de macros)
 ├── PatientCard.tsx
 ├── AppointmentRow.tsx
 ├── StatCard.tsx
-└── ui/
+└── ui/Button.tsx
 
 lib/
-├── api.ts
-├── mock-data.ts
-└── types.ts
+├── api.ts              # cliente HTTP para o backend FastAPI
+├── types.ts
+└── mock-data.ts        # dados de exemplo para front-end funcionar sem backend
 ```
 
----
-
-## Executando o Projeto
+## Como rodar
 
 ```bash
 npm install
 npm run dev
 ```
 
-A aplicação estará disponível em:
+Abra `http://localhost:3000`.
 
-```text
-http://localhost:3000
-```
-
-Configure a URL da API criando um arquivo `.env.local`:
+Por padrão o frontend usa `http://localhost:8000` como backend. Para
+alterar, crie um arquivo `.env.local` com:
 
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:8000
 ```
 
----
+O Next.js carrega automaticamente `.env.local` durante o desenvolvimento.
 
-## Integração com a API
+## Integração com backend
 
-O frontend já possui integração com autenticação e está preparado para consumir os principais recursos da API, incluindo usuários, consultas, dietas e exames. Atualmente, parte das telas utiliza dados simulados para desenvolvimento enquanto os endpoints correspondentes são implementados no backend.
+O cliente de API em `lib/api.ts` expõe chamadas para:
 
----
+- `POST /auth/login`
+- `GET /users/me`
+- `GET /appointments/mine`
+- `GET /exams/patient/{patientId}`
+- `GET /diets/patient/{patientId}`
 
-## Roadmap
+No estado atual do projeto:
 
-* Integração completa das páginas com a API.
-* Gerenciamento de pacientes em tempo real.
-* Cadastro e edição de dietas.
-* Upload e visualização de exames.
-* Estados de carregamento e tratamento de erros.
-* Melhorias de responsividade e experiência do usuário.
+- O login está integrado ao backend e salva o token em `localStorage`.
+- As páginas de pacientes, agenda e detalhamento ainda usam dados
+  mock de `lib/mock-data.ts`.
+- O backend ainda não expõe uma rota `/patients`, por isso a lista de
+  pacientes ainda não está conectada a dados reais.
+
+## O que já está implementado
+
+- Login com backend via `/auth/login`.
+- Dashboard com estatísticas e agenda do dia usando dados mock.
+- Agenda por data com layout pronto.
+- Lista de pacientes e detalhe de paciente com dados de exemplo.
+
+## Próximos passos sugeridos
+
+1. Implementar o endpoint de pacientes no backend e substituir o mock
+   dos pacientes por dados reais.
+2. Buscar dados reais de consultas e dietas nas páginas de agenda e
+   paciente.
+3. Adicionar estados de carregamento e de erro nas requisições.
+4. Ajustar responsividade para telas médias e desktop pequenos.
+5. Criar telas de criação/edição de dieta e upload/visualização de exames.

@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.dependencies import get_current_user, require_role
 from app.database import get_db
-from app.models.user import User, UserRole
+from Backend.app.models.usuario import User, UserRole
 from app.schemas.user import UserRead, PatientProfileUpdate
 
 router = APIRouter(prefix="/users", tags=["Usuários"])

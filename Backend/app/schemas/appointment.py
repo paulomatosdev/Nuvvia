@@ -3,7 +3,7 @@ from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict
 
-from app.models.appointment import AppointmentType, AppointmentStatus
+from Backend.app.models.consulta import AppointmentType, AppointmentStatus
 
 
 class AppointmentCreate(BaseModel):

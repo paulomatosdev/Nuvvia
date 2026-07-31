@@ -9,8 +9,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.auth.dependencies import get_current_user, require_role
 from app.config import get_settings
 from app.database import get_db
-from app.models.meal_log import MealLog, MealLogSource
-from app.models.user import User, UserRole
+from backend.app.models.registro_alimentar import MealLog, MealLogSource
+from Backend.app.models.usuario import User, UserRole
 from app.schemas.meal_log import MealLogRead, MealLogManualCreate, DailyMacroSummary
 from app.services.ai_macro_service import estimate_macros_from_photo
 

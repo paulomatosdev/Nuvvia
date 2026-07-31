@@ -3,7 +3,7 @@ from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict
 
-from app.models.meal_log import MealLogSource
+from backend.app.models.registro_alimentar import MealLogSource
 
 
 class MealLogFromPhotoResult(BaseModel):

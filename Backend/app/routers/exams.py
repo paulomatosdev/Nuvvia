@@ -8,8 +8,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.auth.dependencies import get_current_user, require_role
 from app.config import get_settings
 from app.database import get_db
-from app.models.exam import Exam
-from app.models.user import User, UserRole
+from backend.app.models.exame import Exam
+from Backend.app.models.usuario import User, UserRole
 from app.schemas.exam import ExamRead
 
 router = APIRouter(prefix="/exams", tags=["Exames"])
