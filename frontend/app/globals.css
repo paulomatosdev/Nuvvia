@@ -2,23 +2,123 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * Tema: o painel de embarque é a tela; o cartão de embarque é sempre o inverso.
+ * Claro = painel de saguão iluminado; escuro = painel de portão à noite.
+ */
 :root {
   color-scheme: light;
+  --bg: 236 238 241;
+  --surface: 255 255 255;
+  --line: 213 218 225;
+  --ink: 11 15 20;
+  --muted: 75 85 99;
+  --gate: 255 197 49;
+  --gate-ink: 138 90 0;
+  --ok: 21 122 74;
+  --alert: 201 48 58;
+
+  --pass: 11 15 20;
+  --pass-ink: 245 243 238;
+  --pass-muted: 163 172 185;
+  --pass-line: 42 51 64;
+  --pass-ok: 43 182 115;
+  --pass-alert: 242 85 90;
 }
 
-body {
-  background: #F1F3ED;
-  color: #1D2420;
+.dark {
+  color-scheme: dark;
+  --bg: 11 15 20;
+  --surface: 21 28 37;
+  --line: 30 38 49;
+  --ink: 245 243 238;
+  --muted: 154 164 178;
+  --gate: 255 197 49;
+  --gate-ink: 255 197 49;
+  --ok: 43 182 115;
+  --alert: 242 85 90;
+
+  --pass: 245 243 238;
+  --pass-ink: 11 15 20;
+  --pass-muted: 95 90 78;
+  --pass-line: 207 201 188;
+  --pass-ok: 22 128 76;
+  --pass-alert: 196 40 50;
 }
 
-/* foco visível para navegação por teclado */
-:focus-visible {
-  outline: 2px solid #1F3A2E;
-  outline-offset: 2px;
+@layer base {
+  html {
+    background: rgb(var(--bg));
+  }
+  body {
+    @apply bg-bg font-sans text-base text-ink antialiased;
+    font-feature-settings: "tnum" 1, "lnum" 1;
+    caret-color: rgb(var(--gate));
+  }
+  ::selection {
+    background: rgb(var(--gate));
+    color: rgb(11 15 20);
+  }
+  :focus-visible {
+    outline: 2px solid rgb(var(--gate));
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+  a {
+    text-underline-offset: 3px;
+  }
+  /* barras de rolagem no tom do painel */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(var(--line)) transparent;
+  }
+  input[type="date"]::-webkit-calendar-picker-indicator,
+  input[type="time"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+  }
+  .dark input[type="date"]::-webkit-calendar-picker-indicator,
+  .dark input[type="time"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+  }
+}
+
+@layer components {
+  /* Picote do cartão de embarque: linha tracejada com entalhes nas bordas */
+  .picote {
+    position: relative;
+    background-image: linear-gradient(to right, rgb(var(--pass-line)) 55%, transparent 0%);
+    background-size: 12px 2px;
+    background-repeat: repeat-x;
+    background-position: left bottom;
+  }
+  .picote::before,
+  .picote::after {
+    content: "";
+    position: absolute;
+    bottom: -11px;
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: rgb(var(--bg));
+  }
+  .picote::before {
+    left: -11px;
+  }
+  .picote::after {
+    right: -11px;
+  }
+  .rotulo {
+    @apply text-xs font-semibold uppercase tracking-[0.14em];
+  }
+  .campo {
+    @apply w-full rounded-md border border-line bg-surface px-3 py-2.5 text-base text-ink outline-none transition-colors duration-150 placeholder:text-muted focus:border-gate;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  * {
+  *,
+  *::before,
+  *::after {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;

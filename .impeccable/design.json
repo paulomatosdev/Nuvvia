@@ -1,0 +1,106 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-24T22:40:00-03:00",
+  "title": "Design System: Vitta",
+  "extensions": {
+    "colorMeta": {
+      "gate-amber": { "role": "primary", "displayName": "Âmbar de portão" },
+      "boarding-green-dark": { "role": "secondary", "displayName": "Verde de embarque (escuro)" },
+      "boarding-green-light": { "role": "secondary", "displayName": "Verde de embarque (claro)" },
+      "alert-red-dark": { "role": "tertiary", "displayName": "Vermelho de alteração (escuro)" },
+      "alert-red-light": { "role": "tertiary", "displayName": "Vermelho de alteração (claro)" },
+      "board-ground-dark": { "role": "neutral", "displayName": "Painel noturno" },
+      "board-ground-light": { "role": "neutral", "displayName": "Painel de saguão" },
+      "pass-paper": { "role": "neutral", "displayName": "Papel do cartão" },
+      "pass-night": { "role": "neutral", "displayName": "Cartão noturno" }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Título da tela e nome do paciente no cartão." },
+      "label": { "displayName": "Rótulo", "purpose": "Cabeçalhos de coluna e rótulos de campo; nunca acima de título de página." },
+      "data": { "displayName": "Dado", "purpose": "Horários, quantidades e percentuais." }
+    },
+    "shadows": [
+      { "name": "pass", "value": "0 1px 2px rgb(0 0 0 / 0.12), 0 12px 32px -8px rgb(0 0 0 / 0.35)", "purpose": "Única elevação do sistema: o cartão de embarque." }
+    ],
+    "motion": [
+      { "name": "ease-out", "value": "cubic-bezier(0.16, 1, 0.3, 1)", "purpose": "Entradas, barras, contagem de números, troca de tema." },
+      { "name": "spring-layout", "value": "spring(stiffness 420, damping 40, mass 0.9)", "purpose": "Reordenação de linhas e placa ativa da navegação, sem quique." },
+      { "name": "stagger-list", "value": "40ms", "purpose": "Cascata de linhas em listas." },
+      { "name": "split-flap", "value": "rotateX -90deg → 0, 320ms, perspective 400px", "purpose": "Troca da pílula de status." },
+      { "name": "pass-print", "value": "clip-path inset(0 0 100% 0) → inset(0), 700ms", "purpose": "Entrada do cartão de embarque; desligada com movimento reduzido." },
+      { "name": "row-lit", "value": "fundo âmbar 20-30% por 6s", "purpose": "Linha cujo status acabou de mudar." }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" },
+      { "name": "xl", "value": "1280px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Ação principal da tela (ex.: Nova consulta).",
+      "html": "<button class=\"ds-btn\">Nova consulta</button>",
+      "css": ".ds-btn{font-family:Barlow,system-ui,sans-serif;font-weight:600;font-size:15px;height:40px;padding:0 16px;border:0;border-radius:6px;background:#0B0F14;color:#ECEEF1;transition:background .15s,transform .15s}.ds-btn:hover{background:#2a2e33}.ds-btn:active{transform:scale(.98)}"
+    },
+    {
+      "name": "Next Pill",
+      "kind": "chip",
+      "refersTo": "pill-next",
+      "description": "Marca a próxima consulta no painel.",
+      "html": "<span class=\"ds-next\">Próxima</span>",
+      "css": ".ds-next{display:inline-block;background:#FFC531;color:#0B0F14;font:700 12px/1 Barlow,system-ui,sans-serif;letter-spacing:.1em;text-transform:uppercase;padding:4px 8px;border-radius:4px}"
+    },
+    {
+      "name": "Input",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Campo do painel com foco âmbar.",
+      "html": "<input class=\"ds-input\" placeholder=\"Buscar por nome ou e-mail\">",
+      "css": ".ds-input{font:400 15px Barlow,system-ui,sans-serif;width:100%;padding:10px 12px;border:1px solid #D5DAE1;border-radius:6px;background:#fff;color:#0B0F14;outline:none}.ds-input:focus{border-color:#FFC531}"
+    },
+    {
+      "name": "Board Row",
+      "kind": "custom",
+      "description": "Linha do painel de consultas.",
+      "html": "<div class=\"ds-row\"><b>14:00</b><span><strong>Beatriz Lima</strong><small>Online · 45 min</small></span><em>Confirmada</em></div>",
+      "css": ".ds-row{display:grid;grid-template-columns:76px 1fr auto;gap:16px;align-items:center;padding:14px 16px;background:#0B0F14;color:#F5F3EE;font-family:Barlow,system-ui,sans-serif;border-bottom:1px solid #1E2631}.ds-row b{font:700 19px 'JetBrains Mono',monospace}.ds-row strong{display:block;font-size:19px;font-weight:600}.ds-row small{color:#9AA4B2;font-size:14px}.ds-row em{font-style:normal;color:#2BB673;font-weight:700;font-size:12px;letter-spacing:.1em;text-transform:uppercase}"
+    },
+    {
+      "name": "Boarding Pass Segment",
+      "kind": "card",
+      "refersTo": "boarding-pass",
+      "description": "Segmento do cartão de embarque com picote.",
+      "html": "<div class=\"ds-pass\"><h3>Hoje vs. meta</h3><p>Calorias <b>1.110 / 1.700 kcal</b></p></div>",
+      "css": ".ds-pass{background:#F5F3EE;color:#0B0F14;border-radius:14px;padding:20px 24px;font-family:Barlow,system-ui,sans-serif;box-shadow:0 1px 2px rgb(0 0 0/.12),0 12px 32px -8px rgb(0 0 0/.35);background-image:linear-gradient(to right,#CFC9BC 55%,transparent 0);background-size:12px 2px;background-repeat:repeat-x;background-position:left bottom}.ds-pass h3{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#5F5A4E;margin:0 0 8px}.ds-pass b{font-family:'JetBrains Mono',monospace}"
+    }
+  ],
+  "narrative": {
+    "northStar": "O painel de embarque",
+    "overview": "A agenda é um painel de partidas que reordena ao vivo; cada paciente é um cartão de embarque picotado, mostrado ao paciente durante a consulta. O mundo empresta tipografia, paleta, densidade e um movimento-assinatura; os controles são os da web.",
+    "keyCharacteristics": [
+      "Painel em grade fixa de colunas com réguas de 1px",
+      "Cartão de embarque sempre inverso ao painel",
+      "Mono para horários e números",
+      "Âmbar só para o agora"
+    ],
+    "rules": [
+      { "name": "O cartão é o inverso", "body": "Cartão claro no tema escuro e escuro no tema claro.", "section": "colors" },
+      { "name": "Uma cor, um significado", "body": "Âmbar = agora; verde = dentro da meta; vermelho = mudou ou fora.", "section": "colors" },
+      { "name": "Medida em mono", "body": "Horários e números em JetBrains Mono tabular; palavras em Barlow.", "section": "typography" }
+    ],
+    "dos": [
+      "Mostrar todo número contra a meta e o período",
+      "Animar a partir de um estado visível e respeitar movimento reduzido"
+    ],
+    "donts": [
+      "Faixas laterais coloridas para estado",
+      "Rótulos acima de títulos de página",
+      "Anéis de progresso",
+      "Âmbar decorativo"
+    ]
+  }
+}
