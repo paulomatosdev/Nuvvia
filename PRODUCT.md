@@ -14,7 +14,7 @@ Pacientes não usam o painel; eles registram refeições e agendam pelo aplicati
 
 ## Product Purpose
 
-O Vitta conecta o consultório ao dia a dia do paciente. A nutricionista agenda consultas, monta rotinas alimentares e guarda exames, e enxerga entre uma consulta e outra o que o paciente de fato comeu, comparado com a meta. Sucesso é a consulta virar uma conversa sobre dados reais da semana, não sobre memória.
+O Nuvvia conecta o consultório ao dia a dia do paciente. A nutricionista agenda consultas, monta rotinas alimentares e guarda exames, e enxerga entre uma consulta e outra o que o paciente de fato comeu, comparado com a meta. Sucesso é a consulta virar uma conversa sobre dados reais da semana, não sobre memória.
 
 ## Positioning
 
@@ -38,7 +38,7 @@ Gestão do consultório e acompanhamento diário pesam igual. O mecanismo que di
 
 ## Brand Commitments
 
-- Nome do produto: **Vitta**. Nada além do nome é compromisso: paleta, tipografia e metáforas visuais anteriores podem ser substituídas.
+- Nome do produto: **Nuvvia**. Nada além do nome é compromisso: paleta, tipografia e metáforas visuais anteriores podem ser substituídas.
 - Idioma da interface: português do Brasil.
 
 ## Evidence on Hand

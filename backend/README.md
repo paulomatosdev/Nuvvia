@@ -1,4 +1,4 @@
-# Sistema de Nutrição e Saúde — Backend
+# Nuvvia — Backend
 
 API em **FastAPI** para o sistema de nutrição: agendamento de consultas
 (presencial/online), exames, dietas personalizadas e diário de macros com

@@ -1,4 +1,4 @@
-# Prato Certo — Painel do Nutricionista (Frontend Web)
+# Nuvvia — Painel da nutricionista (frontend web)
 
 Frontend web em **Next.js + TypeScript + Tailwind** para o painel do
 nutricionista. O projeto está orientado para desktop/PC — o paciente

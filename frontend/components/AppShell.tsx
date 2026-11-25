@@ -29,7 +29,7 @@ export function useUsuario(): UsuarioMe {
 export function Marca({ className = "" }: { className?: string }) {
   return (
     <span className={`font-extrabold tracking-[-0.03em] ${className}`}>
-      Vitta<span className="text-gate">.</span>
+      Nuvvia<span className="text-gate">.</span>
     </span>
   );
 }

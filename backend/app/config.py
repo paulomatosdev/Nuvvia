@@ -8,7 +8,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     # Geral
-    app_name: str = "Sistema de Nutrição e Saúde"
+    app_name: str = "Nuvvia"
     environment: str = "development"
     debug: bool = True
 

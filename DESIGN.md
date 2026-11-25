@@ -1,5 +1,5 @@
 ---
-name: Vitta
+name: Nuvvia
 description: Painel da nutricionista no idioma de um painel de embarque e um cartão de embarque.
 colors:
   board-ground-light: "#ECEEF1"
@@ -105,11 +105,11 @@ components:
     padding: "20px 24px"
 ---
 
-# Design System: Vitta
+# Design System: Nuvvia
 
 ## Overview
 
-O Vitta é um painel de embarque. A agenda do dia é lida como um painel de partidas que reordena ao vivo, e cada paciente é um cartão de embarque picotado que a nutricionista vira para o paciente durante a consulta. O mundo empresta quatro coisas e só essas: a tipografia (Barlow para a interface, JetBrains Mono para horários e números), a paleta de aeroporto (painel neutro, âmbar de portão, verde de embarque, vermelho de alteração), a densidade de grade fixa de colunas e um movimento-assinatura (a linha que muda de estado se move e fica acesa; a pílula de status vira como uma palheta split-flap). Navegação, botões, abas e campos são os componentes web de sempre.
+O Nuvvia é um painel de embarque. A agenda do dia é lida como um painel de partidas que reordena ao vivo, e cada paciente é um cartão de embarque picotado que a nutricionista vira para o paciente durante a consulta. O mundo empresta quatro coisas e só essas: a tipografia (Barlow para a interface, JetBrains Mono para horários e números), a paleta de aeroporto (painel neutro, âmbar de portão, verde de embarque, vermelho de alteração), a densidade de grade fixa de colunas e um movimento-assinatura (a linha que muda de estado se move e fica acesa; a pílula de status vira como uma palheta split-flap). Navegação, botões, abas e campos são os componentes web de sempre.
 
 Há dois temas, claro (saguão iluminado) e escuro (portão à noite). O tema segue o sistema até a usuária escolher, e a escolha fica salva.
 

@@ -6,7 +6,7 @@ import os
 import tempfile
 
 os.environ["DATABASE_URL"] = "sqlite+aiosqlite://"
-os.environ["UPLOAD_DIR"] = tempfile.mkdtemp(prefix="vitta_uploads_")
+os.environ["UPLOAD_DIR"] = tempfile.mkdtemp(prefix="nuvvia_uploads_")
 os.environ["DEBUG"] = "false"
 
 import pytest  # noqa: E402
