@@ -74,6 +74,15 @@ async def listar_pacientes(
     return [await _montar(db, p, current_user) for p in pacientes]
 
 
+@router.get("/me", response_model=PacientePainel)
+async def meu_painel(
+    current_user: Usuario = Depends(require_role(PerfilAcesso.PACIENTE)),
+    db: AsyncSession = Depends(get_db),
+):
+    """Área do paciente: o próprio cartão (macros de hoje, semana, consultas)."""
+    return await _montar(db, current_user, current_user)
+
+
 @router.get("/{paciente_id}", response_model=PacientePainel)
 async def detalhar_paciente(
     paciente_id: uuid.UUID,

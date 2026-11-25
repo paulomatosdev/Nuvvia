@@ -2,10 +2,14 @@ import type {
   Consulta,
   Exame,
   NovaConsulta,
+  NovaRefeicao,
   PacientePainel,
+  PerfilAcesso,
+  RegistroAlimentar,
   RotinaAlimentar,
   StatusConsulta,
   UsuarioMe,
+  UsuarioResumo,
 } from "./types";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://127.0.0.1:8000";
@@ -85,4 +89,29 @@ export const api = {
 
   dietasDoPaciente: (pacienteId: string) =>
     request<RotinaAlimentar[]>(`/dietas/paciente/${pacienteId}`),
+
+  // ---- Conta ----
+  registrar: (dados: { nome_completo: string; email: string; senha: string; perfil_acesso: PerfilAcesso }) =>
+    request<UsuarioMe>("/auth/registrar", { method: "POST", body: JSON.stringify(dados) }),
+
+  atualizarPerfilNutricionista: (dados: { crn?: string | null; bio?: string | null }) =>
+    request("/usuarios/me/nutricionista-perfil", { method: "PUT", body: JSON.stringify(dados) }),
+
+  // ---- Área do paciente ----
+  meuPainel: () => request<PacientePainel>("/pacientes/me"),
+
+  nutricionistas: () => request<UsuarioResumo[]>("/usuarios/nutricionistas"),
+
+  agendarComNutricionista: (dados: Omit<NovaConsulta, "paciente_id"> & { nutricionista_id: string }) =>
+    request<Consulta>("/consultas", { method: "POST", body: JSON.stringify(dados) }),
+
+  refeicoesDeHoje: () => request<RegistroAlimentar[]>("/registros-alimentares/hoje"),
+
+  registrarRefeicao: (dados: NovaRefeicao) =>
+    request<RegistroAlimentar>("/registros-alimentares/manual", { method: "POST", body: JSON.stringify(dados) }),
 };
+
+/** Página inicial de cada perfil depois do login. */
+export function inicioDoPerfil(perfil: PerfilAcesso) {
+  return perfil === "paciente" ? "/minha-area" : "/dashboard";
+}

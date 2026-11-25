@@ -9,8 +9,23 @@ import { Button } from "./ui/Button";
 const campo = "campo";
 const rotulo = "rotulo mb-1.5 block text-muted";
 
-export function NovaConsultaForm({ onCreated, onCancel }: { onCreated: () => void; onCancel: () => void }) {
-  const pacientes = useApi(api.pacientes);
+/**
+ * Agendamento de consulta. A nutricionista escolhe o paciente; o paciente
+ * (paraPaciente) escolhe a nutricionista.
+ */
+export function NovaConsultaForm({
+  onCreated,
+  onCancel,
+  paraPaciente = false,
+}: {
+  onCreated: () => void;
+  onCancel: () => void;
+  paraPaciente?: boolean;
+}) {
+  const pacientes = useApi<{ id: string; nome_completo: string }[]>(
+    paraPaciente ? api.nutricionistas : api.pacientes,
+    [paraPaciente]
+  );
   const [pacienteId, setPacienteId] = useState("");
   const [tipo, setTipo] = useState<TipoConsulta>("online");
   const [data, setData] = useState("");
@@ -31,14 +46,15 @@ export function NovaConsultaForm({ onCreated, onCancel }: { onCreated: () => voi
     }
     setSalvando(true);
     try {
-      await api.criarConsulta({
-        paciente_id: pacienteId,
+      const dados = {
         tipo_consulta: tipo,
         agendamento_data: quando.toISOString(),
         duracao_minutos: duracao,
         local: tipo === "pessoal" ? local : null,
         notas: notas || null,
-      });
+      };
+      if (paraPaciente) await api.agendarComNutricionista({ ...dados, nutricionista_id: pacienteId });
+      else await api.criarConsulta({ ...dados, paciente_id: pacienteId });
       onCreated();
     } catch (err) {
       setErro(err instanceof Error ? err.message : "Não foi possível agendar");
@@ -51,18 +67,19 @@ export function NovaConsultaForm({ onCreated, onCancel }: { onCreated: () => voi
 
   return (
     <form onSubmit={salvar} className="rounded-lg border border-line bg-surface p-6">
-      <h2 className="mb-5 text-xl font-bold text-ink">Nova consulta</h2>
+      <h2 className="mb-5 text-xl font-bold text-ink">{paraPaciente ? "Agendar consulta" : "Nova consulta"}</h2>
 
       {semPacientes ? (
         <p className="text-base text-muted">
-          Você ainda não tem pacientes vinculados. O paciente aparece aqui depois de agendar a primeira consulta pelo
-          aplicativo.
+          {paraPaciente
+            ? "Ainda não há nutricionistas cadastradas para agendar."
+            : "Você ainda não tem pacientes vinculados. O paciente aparece aqui depois de agendar a primeira consulta."}
         </p>
       ) : (
         <div className="grid grid-cols-6 gap-x-4 gap-y-5">
           <div className="col-span-6 sm:col-span-3">
             <label htmlFor="paciente" className={rotulo}>
-              Paciente
+              {paraPaciente ? "Nutricionista" : "Paciente"}
             </label>
             <select
               id="paciente"

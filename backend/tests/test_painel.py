@@ -69,3 +69,19 @@ async def test_datas_sempre_em_utc(client):
     assert r.status_code == 201, r.text
     lida = (await client.get("/consultas/minhas", headers=nut)).json()[0]
     assert lida["agendamento_data"] == "2026-12-10T18:30:00Z"
+
+
+async def test_area_do_paciente(client):
+    pac_id, pac = await criar_usuario(client, "Ana Paciente", "ana@exemplo.com", "paciente")
+    _, nut = await criar_usuario(client, "Nina Nutri", "nina@exemplo.com", "nutricionista")
+    await client.put("/usuarios/me/paciente-perfil", headers=pac, json={"meta_diaria_calorias": 2000})
+    await client.post(
+        "/registros-alimentares/manual",
+        headers=pac,
+        json={"descricao": "Café", "calorias": 400, "proteina_g": 20, "carboidratos_g": 50, "gordura_g": 10},
+    )
+    r = await client.get("/pacientes/me", headers=pac)
+    assert r.status_code == 200, r.text
+    assert r.json()["id"] == pac_id
+    assert r.json()["macros_hoje"]["calorias_consumidas"] == 400
+    assert (await client.get("/pacientes/me", headers=nut)).status_code == 403

@@ -15,8 +15,8 @@ const mono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Nuvvia · Painel da nutricionista",
-  description: "Consultas, pacientes e acompanhamento diário de macros.",
+  title: "Nuvvia",
+  description: "Consultas, dieta e acompanhamento diário de macros, para nutricionistas e pacientes.",
 };
 
 export const viewport: Viewport = {

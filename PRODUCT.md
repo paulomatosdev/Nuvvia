@@ -10,7 +10,7 @@ web
 
 Nutricionistas clínicas que atendem pacientes de forma recorrente (presencial e online). O uso principal do painel acontece **durante a consulta**: a tela fica aberta diante do paciente, e a nutricionista mostra metas, consumo e evolução junto com ele. Também usam o painel para conferir a agenda do dia e revisar um paciente antes de atendê-lo.
 
-Pacientes não usam o painel; eles registram refeições e agendam pelo aplicativo (fora do escopo deste frontend). O painel recusa contas de paciente.
+Pacientes também entram pelo mesmo login, numa área própria ("Minha área" e "Consultas"): veem o próprio cartão (macros de hoje vs. meta e a semana), registram refeições manualmente, veem a dieta ativa e agendam consultas com uma nutricionista. Cada perfil só acessa a própria área. O cadastro público cria contas de nutricionista ou de paciente.
 
 ## Product Purpose
 

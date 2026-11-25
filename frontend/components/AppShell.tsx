@@ -4,22 +4,35 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { createContext, useContext, useEffect } from "react";
 import { MotionConfig, motion } from "motion/react";
-import { CalendarDays, LayoutList, LogOut, Moon, Sun, Users } from "lucide-react";
-import { api, tokenStore } from "@/lib/api";
+import { CalendarDays, LayoutList, LogOut, Moon, Sun, Ticket, Users } from "lucide-react";
+import { api, inicioDoPerfil, tokenStore } from "@/lib/api";
 import { useTema } from "@/lib/tema";
-import { UsuarioMe } from "@/lib/types";
+import { PerfilAcesso, UsuarioMe } from "@/lib/types";
 import { useApi } from "@/lib/useApi";
 import { MOLA_LAYOUT } from "./motion";
 
-const NAV_ITEMS = [
+const NAV_NUTRI = [
   { href: "/dashboard", label: "Hoje", Icone: LayoutList },
   { href: "/agenda", label: "Agenda", Icone: CalendarDays },
   { href: "/pacientes", label: "Pacientes", Icone: Users },
 ];
 
+const NAV_PACIENTE = [
+  { href: "/minha-area", label: "Minha área", Icone: Ticket },
+  { href: "/minhas-consultas", label: "Consultas", Icone: CalendarDays },
+];
+
+type Area = "nutricionista" | "paciente";
+
+/** Perfis que podem abrir cada área do app. */
+const PERMITIDOS: Record<Area, PerfilAcesso[]> = {
+  nutricionista: ["nutricionista", "admin"],
+  paciente: ["paciente"],
+};
+
 const UsuarioContext = createContext<UsuarioMe | null>(null);
 
-/** Nutricionista logada. Só pode ser usado dentro do AppShell. */
+/** Usuário logado. Só pode ser usado dentro do AppShell. */
 export function useUsuario(): UsuarioMe {
   const usuario = useContext(UsuarioContext);
   if (!usuario) throw new Error("useUsuario precisa estar dentro do AppShell");
@@ -58,14 +71,20 @@ export function BotaoTema({ className = "" }: { className?: string }) {
   );
 }
 
-export function AppShell({ children }: { children: React.ReactNode }) {
+export function AppShell({ children, area = "nutricionista" }: { children: React.ReactNode; area?: Area }) {
   const pathname = usePathname();
   const router = useRouter();
   const { data: usuario, error } = useApi(api.me);
+  const permitido = usuario ? PERMITIDOS[area].includes(usuario.perfil_acesso) : false;
 
   useEffect(() => {
     if (!tokenStore.get()) router.replace("/login");
   }, [router]);
+
+  // Cada perfil só vê a própria área; quem entra na área errada é levado à sua
+  useEffect(() => {
+    if (usuario && !permitido) router.replace(inicioDoPerfil(usuario.perfil_acesso));
+  }, [usuario, permitido, router]);
 
   function sair() {
     tokenStore.clear();
@@ -73,12 +92,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   }
 
   const crn = usuario?.nutricionista_perfil?.crn;
+  const NAV_ITEMS = usuario?.perfil_acesso === "paciente" ? NAV_PACIENTE : NAV_NUTRI;
+  const subtitulo = usuario?.perfil_acesso === "paciente" ? usuario.email : (crn ?? "CRN não informado");
 
   return (
     <MotionConfig reducedMotion="user">
       <div className="flex min-h-screen flex-col bg-bg md:flex-row">
         <aside className="sticky top-0 z-20 flex shrink-0 items-center gap-2 border-b border-line bg-bg/90 px-4 py-3 backdrop-blur md:h-screen md:w-56 md:flex-col md:items-stretch md:gap-0 md:border-b-0 md:border-r md:px-3 md:py-6 md:backdrop-blur-none">
-          <Link href="/dashboard" className="px-2 text-2xl md:mb-8">
+          <Link href={usuario ? inicioDoPerfil(usuario.perfil_acesso) : "/login"} className="px-2 text-2xl md:mb-8">
             <Marca />
           </Link>
 
@@ -113,7 +134,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             {usuario && (
               <div className="hidden px-2 md:block">
                 <p className="truncate text-base font-semibold text-ink">{usuario.nome_completo}</p>
-                <p className="truncate font-mono text-xs text-muted">{crn ?? "CRN não informado"}</p>
+                <p className="truncate font-mono text-xs text-muted">{subtitulo}</p>
               </div>
             )}
             <div className="flex items-center gap-1 md:px-1">
@@ -135,18 +156,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <p role="alert" className="text-base text-alert">
               {error}
             </p>
-          ) : !usuario ? (
+          ) : !usuario || !permitido ? (
             <div className="h-8 w-64 animate-pulse rounded bg-line" aria-label="Carregando" />
-          ) : usuario.perfil_acesso === "paciente" ? (
-            <div className="max-w-md">
-              <h1 className="text-2xl font-bold text-ink">Acesso restrito</h1>
-              <p className="mt-2 text-base text-muted">
-                Este painel é para nutricionistas. Pacientes acompanham as metas pelo aplicativo.
-              </p>
-              <button type="button" onClick={sair} className="mt-4 text-base font-semibold text-ink underline">
-                Entrar com outra conta
-              </button>
-            </div>
           ) : (
             <UsuarioContext.Provider value={usuario}>{children}</UsuarioContext.Provider>
           )}

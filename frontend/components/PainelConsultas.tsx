@@ -90,6 +90,7 @@ function LinhaConsulta({
   onSelect,
   onChange,
   rotuloDia,
+  visaoPaciente,
 }: {
   consulta: Consulta;
   proxima: boolean;
@@ -98,6 +99,7 @@ function LinhaConsulta({
   onSelect?: (c: Consulta) => void;
   onChange?: (c: Consulta) => void;
   rotuloDia?: string;
+  visaoPaciente: boolean;
 }) {
   const [salvando, setSalvando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
@@ -138,7 +140,11 @@ function LinhaConsulta({
       </span>
 
       <div className="min-w-0">
-        {onSelect ? (
+        {visaoPaciente ? (
+          <p className={`truncate text-lg font-semibold ${encerrada ? "text-muted" : "text-ink"}`}>
+            {consulta.nutricionista.nome_completo}
+          </p>
+        ) : onSelect ? (
           <button
             type="button"
             onClick={() => onSelect(consulta)}
@@ -226,6 +232,7 @@ export function PainelConsultas({
   rotuloDia,
   destacarProxima = true,
   vazio,
+  visaoPaciente = false,
 }: {
   consultas: Consulta[];
   onChange?: (c: Consulta) => void;
@@ -234,6 +241,8 @@ export function PainelConsultas({
   rotuloDia?: (c: Consulta) => string | undefined;
   destacarProxima?: boolean;
   vazio?: React.ReactNode;
+  /** Paciente vendo as próprias consultas: mostra a nutricionista. */
+  visaoPaciente?: boolean;
 }) {
   const [acesas, setAcesas] = useState<Set<string>>(new Set());
   const ordenadas = ordenarPainel(consultas);
@@ -261,7 +270,7 @@ export function PainelConsultas({
         aria-hidden
       >
         <span>Hora</span>
-        <span>Paciente</span>
+        <span>{visaoPaciente ? "Nutricionista" : "Paciente"}</span>
         <span>Tipo</span>
         <span>Status</span>
       </div>
@@ -280,6 +289,7 @@ export function PainelConsultas({
                 onSelect={onSelect}
                 onChange={onChange ? aoMudar : undefined}
                 rotuloDia={rotuloDia?.(c)}
+                visaoPaciente={visaoPaciente}
               />
             ))}
           </ul>

@@ -109,6 +109,30 @@ export type Exame = {
   criacao_data: string;
 };
 
+export type UsuarioResumo = { id: string; nome_completo: string; email: string };
+
+export type RegistroAlimentar = {
+  id: string;
+  paciente_id: string;
+  fonte: "foto_ia" | "manual";
+  foto_url: string | null;
+  descricao: string;
+  calorias: number;
+  proteina_g: number;
+  carboidratos_g: number;
+  gordura_g: number;
+  ai_confidence: number | null;
+  registro_data: string;
+};
+
+export type NovaRefeicao = {
+  descricao: string;
+  calorias: number;
+  proteina_g: number;
+  carboidratos_g: number;
+  gordura_g: number;
+};
+
 // ---- Tipos de apresentação ----
 
 export type MacroGoal = {
