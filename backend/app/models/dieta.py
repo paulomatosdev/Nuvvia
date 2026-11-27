@@ -2,7 +2,7 @@ import enum
 import uuid
 from datetime import date, datetime
 
-from sqlalchemy import Date, DateTime, Enum, ForeignKey, String, func
+from sqlalchemy import Date, DateTime, Enum, ForeignKey, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
@@ -16,12 +16,19 @@ class DietaMeta(str, enum.Enum):
 
 
 class RotinaAlimentar(Base):
-    """Plano de dieta montado pelo nutricionista para um paciente."""
+    """
+    Plano de dieta de um paciente. Pode ser montado por uma nutricionista
+    (origem "nutricionista") ou gerado pelo app a partir do questionário
+    (origem "app", sem nutricionista).
+    """
     __tablename__ = "rotina_alimentar"
 
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
     paciente_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("usuarios.id"), nullable=False, index=True)
-    nutricionista_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("usuarios.id"), nullable=False)
+    nutricionista_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("usuarios.id"), nullable=True)
+    origem: Mapped[str] = mapped_column(String(20), nullable=False, default="nutricionista", server_default="nutricionista")
+    # Como o plano foi calculado (gerado pelo app), em texto para o paciente
+    explicacao: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     titulo: Mapped[str] = mapped_column(String(150), nullable=False)
     objetivo: Mapped[DietaMeta] = mapped_column(Enum(DietaMeta), nullable=False)
@@ -46,6 +53,8 @@ class PlanoAlimentar(Base):
 
     nome: Mapped[str] = mapped_column(String(100), nullable=False)  # ex: "Café da manhã"
     horario: Mapped[str] = mapped_column(String(20), nullable=False)  # ex: "07:30"
+    # Dia da semana (0 = segunda ... 6 = domingo); vazio = vale para todos os dias
+    dia_semana: Mapped[int | None] = mapped_column(nullable=True)
     descricao: Mapped[str] = mapped_column(String(1000), nullable=False)  # itens da refeição
 
     meta_calorias: Mapped[float | None] = mapped_column(nullable=True)

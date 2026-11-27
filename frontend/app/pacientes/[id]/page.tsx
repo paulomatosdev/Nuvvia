@@ -6,6 +6,8 @@ import { ArrowLeft, FileText } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { CartaoEmbarque } from "@/components/CartaoEmbarque";
 import { Estado } from "@/components/Estado";
+import { ResumoQuestionario } from "@/components/ResumoQuestionario";
+import { DietaPlano } from "@/components/DietaPlano";
 import { cascata } from "@/components/motion";
 import { api } from "@/lib/api";
 import { dataCurta, numero } from "@/lib/format";
@@ -68,6 +70,10 @@ function DetalhePaciente({ id }: { id: string }) {
         </p>
       )}
 
+      <div className="mt-10">
+        <ResumoQuestionario pacienteId={id} />
+      </div>
+
       <div className="mt-10 grid gap-10 lg:grid-cols-2">
         <section aria-labelledby="dietas">
           <h2 id="dietas" className="text-xl font-bold text-ink">
@@ -95,24 +101,10 @@ function DetalhePaciente({ id }: { id: string }) {
                           </span>
                         )}
                         {OBJETIVO_LABEL[d.objetivo]} · desde {dataCurta(d.data_inicio)}
+                        {d.origem === "app" && " · gerada pelo app"}
                       </span>
                     </header>
-                    {d.refeicoes.length > 0 && (
-                      <ul className="divide-y divide-line">
-                        {d.refeicoes.map((r) => (
-                          <li key={r.id} className="grid grid-cols-[3.5rem_1fr_auto] items-baseline gap-x-4 px-4 py-3">
-                            <span className="font-mono text-base font-bold text-ink">{r.horario}</span>
-                            <span className="min-w-0">
-                              <span className="block text-base font-semibold text-ink">{r.nome}</span>
-                              <span className="block text-sm text-muted">{r.descricao}</span>
-                            </span>
-                            <span className="font-mono text-sm text-muted">
-                              {r.meta_calorias ? `${numero(r.meta_calorias)} kcal` : ""}
-                            </span>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
+                    {d.refeicoes.length > 0 && <DietaPlano dieta={d} />}
                   </motion.article>
                 ))}
               </motion.div>

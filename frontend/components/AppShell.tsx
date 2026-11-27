@@ -4,7 +4,8 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { createContext, useContext, useEffect } from "react";
 import { MotionConfig, motion } from "motion/react";
-import { CalendarDays, LayoutList, LogOut, Moon, Sun, Ticket, Users } from "lucide-react";
+import { CalendarDays, Clock, LayoutList, LogOut, Moon, Sun, Ticket, Users } from "lucide-react";
+import { Notificacoes } from "./Notificacoes";
 import { api, inicioDoPerfil, tokenStore } from "@/lib/api";
 import { useTema } from "@/lib/tema";
 import { PerfilAcesso, UsuarioMe } from "@/lib/types";
@@ -15,6 +16,7 @@ const NAV_NUTRI = [
   { href: "/dashboard", label: "Hoje", Icone: LayoutList },
   { href: "/agenda", label: "Agenda", Icone: CalendarDays },
   { href: "/pacientes", label: "Pacientes", Icone: Users },
+  { href: "/atendimento", label: "Atendimento", Icone: Clock },
 ];
 
 const NAV_PACIENTE = [
@@ -138,6 +140,7 @@ export function AppShell({ children, area = "nutricionista" }: { children: React
               </div>
             )}
             <div className="flex items-center gap-1 md:px-1">
+              {usuario && <Notificacoes />}
               <BotaoTema />
               <button
                 type="button"

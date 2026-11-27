@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { Plus, Utensils } from "lucide-react";
+import Link from "next/link";
+import { ArrowRight, Plus, Sparkles, Utensils } from "lucide-react";
+import { ComoCalculamos, DietaPlano } from "@/components/DietaPlano";
 import { AppShell, useUsuario } from "@/components/AppShell";
 import { CartaoEmbarque } from "@/components/CartaoEmbarque";
 import { Estado } from "@/components/Estado";
@@ -26,9 +28,11 @@ function MinhaArea() {
   const painel = useApi(api.meuPainel);
   const refeicoes = useApi(api.refeicoesDeHoje);
   const dietas = useApi(() => api.dietasDoPaciente(usuario.id), [usuario.id]);
+  const questionario = useApi(api.meuUltimoQuestionario);
   const [registrando, setRegistrando] = useState(false);
 
   const dietaAtiva = (dietas.data ?? []).find((d) => d.ativo) ?? null;
+  const semQuestionario = !questionario.loading && !questionario.error && questionario.data === null;
 
   function aoRegistrar() {
     setRegistrando(false);
@@ -44,6 +48,29 @@ function MinhaArea() {
         </h1>
         <p className="mt-1 text-lg text-muted">{dataPorExtenso()}.</p>
       </header>
+
+      {semQuestionario && (
+        <motion.div
+          initial={{ opacity: 0.35, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: EASE_OUT }}
+          className="mt-6 flex flex-wrap items-center justify-between gap-4 rounded-lg border border-gate/60 bg-gate/10 px-5 py-4"
+        >
+          <div>
+            <p className="text-lg font-bold text-ink">Monte sua dieta personalizada</p>
+            <p className="text-base text-muted">
+              Responda algumas perguntas e montamos um cardápio com o que você gosta, ou agende com uma nutricionista.
+            </p>
+          </div>
+          <Link
+            href="/questionario"
+            className="inline-flex h-10 items-center gap-2 rounded-md bg-ink px-4 text-base font-semibold text-bg transition-colors hover:bg-ink/85"
+          >
+            Começar
+            <ArrowRight className="size-4" aria-hidden />
+          </Link>
+        </motion.div>
+      )}
 
       <div className="mt-6 grid items-start gap-8 xl:grid-cols-[minmax(0,1fr)_25rem]">
         <div className="order-2 min-w-0 space-y-10 xl:order-1">
@@ -110,9 +137,16 @@ function MinhaArea() {
           </section>
 
           <section aria-labelledby="dieta">
-            <h2 id="dieta" className="text-xl font-bold text-ink">
-              Sua dieta
-            </h2>
+            <div className="flex flex-wrap items-baseline justify-between gap-3">
+              <h2 id="dieta" className="text-xl font-bold text-ink">
+                Sua dieta
+              </h2>
+              {questionario.data && (
+                <Link href="/questionario" className="text-sm font-semibold text-muted underline hover:text-ink">
+                  Refazer questionário
+                </Link>
+              )}
+            </div>
             <div className="mt-3 overflow-hidden rounded-lg border border-line">
               <Estado
                 loading={dietas.loading}
@@ -120,32 +154,34 @@ function MinhaArea() {
                 onRetry={dietas.reload}
                 linhas={3}
                 vazio={!dietaAtiva}
-                mensagemVazio="Sua nutricionista ainda não montou uma dieta para você."
+                mensagemVazio="Você ainda não tem uma dieta. Responda o questionário ou agende com uma nutricionista."
               >
                 {dietaAtiva && (
                   <>
-                    <p className="border-b border-line px-4 py-3 text-lg font-bold text-ink">{dietaAtiva.titulo}</p>
-                    <ul className="divide-y divide-line">
-                      {dietaAtiva.refeicoes.map((r) => (
-                        <li key={r.id} className="grid grid-cols-[3.5rem_1fr_auto] items-baseline gap-x-4 px-4 py-3">
-                          <span className="font-mono text-base font-bold text-ink">{r.horario}</span>
-                          <span className="min-w-0">
-                            <span className="flex items-center gap-2 text-base font-semibold text-ink">
-                              <Utensils className="size-4 text-muted" aria-hidden />
-                              {r.nome}
-                            </span>
-                            <span className="block text-sm text-muted">{r.descricao}</span>
-                          </span>
-                          <span className="font-mono text-sm text-muted">
-                            {r.meta_calorias ? `${numero(r.meta_calorias)} kcal` : ""}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
+                    <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-line px-4 py-3">
+                      <p className="text-lg font-bold text-ink">{dietaAtiva.titulo}</p>
+                      <p className="flex items-center gap-1.5 text-sm text-muted">
+                        {dietaAtiva.origem === "app" ? (
+                          <>
+                            <Sparkles className="size-4" aria-hidden /> Montada pelo Nuvvia
+                          </>
+                        ) : (
+                          <>
+                            <Utensils className="size-4" aria-hidden /> Montada pela sua nutricionista
+                          </>
+                        )}
+                      </p>
+                    </div>
+                    <DietaPlano dieta={dietaAtiva} />
                   </>
                 )}
               </Estado>
             </div>
+            {dietaAtiva?.explicacao && (
+              <div className="mt-4">
+                <ComoCalculamos explicacao={dietaAtiva.explicacao} />
+              </div>
+            )}
           </section>
         </div>
 

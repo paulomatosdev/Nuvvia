@@ -8,7 +8,7 @@ futuras), dietas, exames e registros alimentares dos últimos 7 dias.
 Não faz nada se a nutricionista de demonstração já existir.
 
 Login de demonstração (somente para desenvolvimento):
-    nutricionista: demo.nutri@example.com / vitta-demo-123
+    nutricionistas: demo.nutri@example.com e renato.nutri@example.com / vitta-demo-123
     pacientes:     <nome>@example.com      / vitta-demo-123
 """
 import asyncio
@@ -34,6 +34,7 @@ from app.models import (
     TipoConsulta,
     Usuario,
 )
+from app.models.usuario import Disponibilidade
 
 SENHA_DEMO = "vitta-demo-123"
 EMAIL_NUTRI = "demo.nutri@example.com"
@@ -68,14 +69,51 @@ async def main() -> None:
             email=EMAIL_NUTRI,
             senha_hashed=senha,
             perfil_acesso=PerfilAcesso.NUTRICIONISTA,
-            nutricionista_perfil=NutricionistaPerfil(crn="CRN-3 12345", bio="Nutrição clínica e esportiva"),
+            nutricionista_perfil=NutricionistaPerfil(
+                crn="CRN-3 12345",
+                bio="Nutrição clínica e esportiva",
+                cidade="São Paulo",
+                bairro="Pinheiros",
+                endereco="Rua das Palmeiras, 120 - sala 4",
+                disponibilidades=[
+                    *[Disponibilidade(dia_semana=d, hora_inicio="08:00", hora_fim="12:00") for d in range(5)],
+                    *[Disponibilidade(dia_semana=d, hora_inicio="14:00", hora_fim="18:00") for d in range(5)],
+                    Disponibilidade(dia_semana=5, hora_inicio="08:00", hora_fim="12:00"),
+                ],
+            ),
         )
         db.add(nutri)
+        # Segunda nutricionista, em outra cidade e só à noite, para o agente ter opções
+        db.add(
+            Usuario(
+                nome_completo="Renato Alves",
+                email="renato.nutri@example.com",
+                senha_hashed=senha,
+                perfil_acesso=PerfilAcesso.NUTRICIONISTA,
+                nutricionista_perfil=NutricionistaPerfil(
+                    crn="CRN-3 67890",
+                    cidade="Campinas",
+                    bairro="Cambuí",
+                    endereco="Av. Júlio de Mesquita, 500",
+                    disponibilidades=[
+                        Disponibilidade(dia_semana=d, hora_inicio="18:00", hora_fim="21:00") for d in (1, 2, 3)
+                    ],
+                ),
+            )
+        )
         await db.flush()
 
         horarios_hoje = iter([(9, 0), (10, 30), (14, 0), (16, 0)])
         for i, (nome, email, meta, peso, altura, nasc, metas, disciplina) in enumerate(PACIENTES):
-            perfil = PacientePerfil(meta=meta, peso_kg=peso, altura_cm=altura, data_nascimento=nasc)
+            # Todos já tiveram a primeira consulta concluída: ficam vinculados à nutricionista
+            perfil = PacientePerfil(
+                meta=meta,
+                peso_kg=peso,
+                altura_cm=altura,
+                data_nascimento=nasc,
+                cidade="São Paulo",
+                nutricionista_id=nutri.id,
+            )
             if metas:
                 (
                     perfil.meta_diaria_calorias,

@@ -6,7 +6,9 @@ from app.auth.dependencies import get_current_user, require_role
 from app.database import get_db
 from app.models.consulta import Consulta
 from app.models.dieta import RotinaAlimentar
-from app.models.usuario import NutricionistaPerfil, PacientePerfil, PerfilAcesso, Usuario
+from app.models.usuario import Disponibilidade, NutricionistaPerfil, PacientePerfil, PerfilAcesso, Usuario
+from app.schemas.agendamento import JanelaDisponibilidade
+from app.schemas.consulta import UsuarioResumo
 from app.schemas.usuario import (
     NutricionistaPerfilAtualizar,
     NutricionistaPerfilLer,
@@ -96,3 +98,41 @@ async def listar_meus_pacientes(
         .order_by(Usuario.nome_completo)
     )
     return (await db.scalars(stmt)).all()
+
+
+@router.get("/me/disponibilidade", response_model=list[JanelaDisponibilidade])
+async def minha_disponibilidade(
+    current_user: Usuario = Depends(require_role(PerfilAcesso.NUTRICIONISTA)),
+):
+    perfil = current_user.nutricionista_perfil
+    janelas = perfil.disponibilidades if perfil else []
+    return sorted(janelas, key=lambda j: (j.dia_semana, j.hora_inicio))
+
+
+@router.put("/me/disponibilidade", response_model=list[JanelaDisponibilidade])
+async def definir_disponibilidade(
+    janelas: list[JanelaDisponibilidade],
+    current_user: Usuario = Depends(require_role(PerfilAcesso.NUTRICIONISTA)),
+    db: AsyncSession = Depends(get_db),
+):
+    """Substitui as janelas semanais de atendimento usadas pelo agente de agendamento."""
+    perfil = current_user.nutricionista_perfil or NutricionistaPerfil()
+    current_user.nutricionista_perfil = perfil
+    perfil.disponibilidades = [
+        Disponibilidade(dia_semana=j.dia_semana, hora_inicio=j.hora_inicio, hora_fim=j.hora_fim) for j in janelas
+    ]
+    await db.commit()
+    await db.refresh(perfil, attribute_names=["disponibilidades"])
+    return sorted(perfil.disponibilidades, key=lambda j: (j.dia_semana, j.hora_inicio))
+
+
+@router.get("/me/nutricionista", response_model=UsuarioResumo | None)
+async def minha_nutricionista(
+    current_user: Usuario = Depends(require_role(PerfilAcesso.PACIENTE)),
+    db: AsyncSession = Depends(get_db),
+):
+    """Nutricionista que acompanha o paciente (definida após a primeira consulta concluída)."""
+    perfil = current_user.paciente_perfil
+    if not perfil or not perfil.nutricionista_id:
+        return None
+    return await db.get(Usuario, perfil.nutricionista_id)

@@ -1,0 +1,22 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "api-demo",
+      "runtimeExecutable": "C:/Users/paulo/python/VittaNutricion/backend/.venv/Scripts/python.exe",
+      "runtimeArgs": ["-m", "uvicorn", "app.main:app", "--port", "8000"],
+      "cwd": "backend",
+      "env": {
+        "DATABASE_URL": "sqlite+aiosqlite:///C:/Users/paulo/AppData/Local/Temp/claude/09565fec9ad7b6ba/f197f767-0aee-4b82-a7b3-8b39d6c31354/scratchpad/vitta_dev.db",
+        "DEBUG": "false"
+      },
+      "port": 8000
+    },
+    {
+      "name": "web",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "frontend", "run", "dev"],
+      "port": 3000
+    }
+  ]
+}

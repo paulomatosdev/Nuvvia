@@ -6,11 +6,30 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.dependencies import get_current_user, obter_usuario_com_perfil, require_role
 from app.database import get_db
-from app.models.consulta import Consulta, TipoConsulta
+from app.models.consulta import Consulta, StatusConsulta, TipoConsulta
 from app.models.usuario import PerfilAcesso, Usuario
+from app.services.notificacoes import notificar
 from app.schemas.consulta import ConsultaCriar, ConsultaLer, ConsultaStatusAtualizar
 
 router = APIRouter(prefix="/consultas", tags=["Consultas"])
+
+
+async def _vincular(db: AsyncSession, consulta: Consulta) -> None:
+    """Após a primeira consulta concluída, o paciente passa a ser acompanhado pela nutricionista."""
+    paciente = await db.get(Usuario, consulta.paciente_id)
+    perfil = paciente.paciente_perfil if paciente else None
+    if perfil is None or perfil.nutricionista_id is not None:
+        return
+    perfil.nutricionista_id = consulta.nutricionista_id
+    notificar(
+        db,
+        paciente.id,
+        "vinculo",
+        "Você agora tem acompanhamento",
+        f"{consulta.nutricionista.nome_completo} vai acompanhar sua evolução. "
+        "As próximas consultas serão marcadas com ela.",
+        consulta.id,
+    )
 
 
 @router.post("", response_model=ConsultaLer, status_code=201)
@@ -77,6 +96,8 @@ async def atualizar_status_consulta(
         raise HTTPException(status_code=404, detail="Consulta não encontrada")
 
     consulta.status = payload.status
+    if payload.status == StatusConsulta.COMPLETADO:
+        await _vincular(db, consulta)
     await db.commit()
     await db.refresh(consulta)
     return consulta

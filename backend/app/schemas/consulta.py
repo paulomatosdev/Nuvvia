@@ -36,6 +36,7 @@ class ConsultaLer(BaseModel):
     video_chamada_url: str | None
     local: str | None
     notas: str | None
+    motivo_agente: str | None = None
     criacao_data: DataHoraUTC
 
 class ConsultaStatusAtualizar(BaseModel):

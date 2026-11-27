@@ -1,9 +1,11 @@
 from app.database import Base
-from app.models.usuario import Usuario, PacientePerfil, NutricionistaPerfil, PerfilAcesso
+from app.models.usuario import Disponibilidade, Usuario, PacientePerfil, NutricionistaPerfil, PerfilAcesso
 from app.models.consulta import Consulta, TipoConsulta, StatusConsulta
 from app.models.exame import Exame
 from app.models.dieta import RotinaAlimentar, PlanoAlimentar, DietaMeta
 from app.models.registro_alimentar import RegistroAlimentar, FonteRegistro
+from app.models.questionario import Questionario
+from app.models.notificacao import Notificacao
 
 __all__ = [
     "Base",
@@ -12,4 +14,5 @@ __all__ = [
     "Exame",
     "RotinaAlimentar", "PlanoAlimentar", "DietaMeta",
     "RegistroAlimentar", "FonteRegistro",
+    "Questionario", "Notificacao", "Disponibilidade",
 ]

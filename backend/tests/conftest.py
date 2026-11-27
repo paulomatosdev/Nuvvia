@@ -8,6 +8,7 @@ import tempfile
 os.environ["DATABASE_URL"] = "sqlite+aiosqlite://"
 os.environ["UPLOAD_DIR"] = tempfile.mkdtemp(prefix="nuvvia_uploads_")
 os.environ["DEBUG"] = "false"
+os.environ["LEMBRETES_AUTOMATICOS"] = "false"
 
 import pytest  # noqa: E402
 from httpx import ASGITransport, AsyncClient  # noqa: E402

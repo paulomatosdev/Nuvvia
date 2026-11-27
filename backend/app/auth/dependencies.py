@@ -9,7 +9,7 @@ from app.auth.security import decode_access_token
 from app.database import get_db
 from app.models.consulta import Consulta
 from app.models.dieta import RotinaAlimentar
-from app.models.usuario import PerfilAcesso, Usuario
+from app.models.usuario import PacientePerfil, PerfilAcesso, Usuario
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/token")
 
@@ -57,9 +57,13 @@ def require_role(*allowed_roles: PerfilAcesso):
 async def nutricionista_atende_paciente(
     db: AsyncSession, nutricionista_id: uuid.UUID, paciente_id: uuid.UUID
 ) -> bool:
-    """Há vínculo quando existe ao menos uma consulta ou rotina alimentar entre os dois."""
+    """Há vínculo quando existe consulta, rotina alimentar ou acompanhamento entre os dois."""
     stmt = select(
         or_(
+            exists().where(
+                PacientePerfil.usuario_id == paciente_id,
+                PacientePerfil.nutricionista_id == nutricionista_id,
+            ),
             exists().where(
                 Consulta.nutricionista_id == nutricionista_id,
                 Consulta.paciente_id == paciente_id,

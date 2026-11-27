@@ -52,6 +52,6 @@ async def listar_rotinas_do_paciente(
     stmt = (
         select(RotinaAlimentar)
         .where(RotinaAlimentar.paciente_id == paciente_id)
-        .order_by(RotinaAlimentar.data_inicio.desc())
+        .order_by(RotinaAlimentar.data_inicio.desc(), RotinaAlimentar.criacao_data.desc())
     )
     return (await db.scalars(stmt)).all()

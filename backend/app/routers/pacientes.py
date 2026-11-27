@@ -9,8 +9,10 @@ from app.auth.dependencies import garantir_acesso_paciente, require_role
 from app.database import get_db
 from app.models.consulta import Consulta, StatusConsulta
 from app.models.dieta import RotinaAlimentar
-from app.models.usuario import PerfilAcesso, Usuario
+from app.models.questionario import Questionario
+from app.models.usuario import PacientePerfil, PerfilAcesso, Usuario
 from app.schemas.paciente import PacientePainel
+from app.schemas.questionario import QuestionarioLer
 from app.services.resumo import adesao_da_semana, resumo_do_dia, semana_do_paciente
 
 router = APIRouter(prefix="/pacientes", tags=["Pacientes (painel)"])
@@ -68,7 +70,10 @@ async def listar_pacientes(
         ids_rotina = select(RotinaAlimentar.paciente_id).where(
             RotinaAlimentar.nutricionista_id == current_user.id
         )
-        stmt = stmt.where(or_(Usuario.id.in_(ids_consulta), Usuario.id.in_(ids_rotina)))
+        ids_vinculo = select(PacientePerfil.usuario_id).where(PacientePerfil.nutricionista_id == current_user.id)
+        stmt = stmt.where(
+            or_(Usuario.id.in_(ids_consulta), Usuario.id.in_(ids_rotina), Usuario.id.in_(ids_vinculo))
+        )
 
     pacientes = (await db.scalars(stmt.order_by(Usuario.nome_completo))).all()
     return [await _montar(db, p, current_user) for p in pacientes]
@@ -94,3 +99,20 @@ async def detalhar_paciente(
     if paciente is None or paciente.perfil_acesso != PerfilAcesso.PACIENTE:
         raise HTTPException(status_code=404, detail="Paciente não encontrado")
     return await _montar(db, paciente, current_user)
+
+
+@router.get("/{paciente_id}/questionario", response_model=QuestionarioLer | None)
+async def questionario_do_paciente(
+    paciente_id: uuid.UUID,
+    current_user: Usuario = Depends(somente_equipe),
+    db: AsyncSession = Depends(get_db),
+):
+    """Últimas respostas do questionário alimentar, para a nutricionista."""
+    await garantir_acesso_paciente(db, current_user, paciente_id)
+    stmt = (
+        select(Questionario)
+        .where(Questionario.paciente_id == paciente_id)
+        .order_by(Questionario.criacao_data.desc())
+        .limit(1)
+    )
+    return await db.scalar(stmt)

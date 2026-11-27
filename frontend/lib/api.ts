@@ -1,4 +1,16 @@
 import type {
+  JanelaDisponibilidade,
+  Notificacao,
+  NutricionistaPerfil,
+  PacientePerfil,
+  Periodo,
+  PreferenciaTipo,
+  ResultadoAgendamento,
+  AlimentoCatalogo,
+  AlimentoOpcao,
+  QuestionarioSalvo,
+  RespostasQuestionario,
+  ResultadoQuestionario,
   Consulta,
   Exame,
   NovaConsulta,
@@ -58,8 +70,11 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
     throw new ApiError(mensagemDeErro(body, response.status), response.status);
   }
 
+  if (response.status === 204) return undefined as T;
   return response.json() as Promise<T>;
 }
+
+const requestSemCorpo = (path: string, options: RequestInit = {}) => request<void>(path, options);
 
 export const api = {
   login: (email: string, senha: string) =>
@@ -94,7 +109,7 @@ export const api = {
   registrar: (dados: { nome_completo: string; email: string; senha: string; perfil_acesso: PerfilAcesso }) =>
     request<UsuarioMe>("/auth/registrar", { method: "POST", body: JSON.stringify(dados) }),
 
-  atualizarPerfilNutricionista: (dados: { crn?: string | null; bio?: string | null }) =>
+  atualizarPerfilNutricionista: (dados: Partial<NutricionistaPerfil>) =>
     request("/usuarios/me/nutricionista-perfil", { method: "PUT", body: JSON.stringify(dados) }),
 
   // ---- Área do paciente ----
@@ -106,6 +121,53 @@ export const api = {
     request<Consulta>("/consultas", { method: "POST", body: JSON.stringify(dados) }),
 
   refeicoesDeHoje: () => request<RegistroAlimentar[]>("/registros-alimentares/hoje"),
+
+  // ---- Questionário alimentar ----
+  alimentosDoQuestionario: () => request<AlimentoOpcao[]>("/questionario/alimentos"),
+
+  meuUltimoQuestionario: () => request<QuestionarioSalvo | null>("/questionario/ultimo"),
+
+  responderQuestionario: (respostas: RespostasQuestionario) =>
+    request<ResultadoQuestionario>("/questionario", { method: "POST", body: JSON.stringify(respostas) }),
+
+  questionarioDoPaciente: (pacienteId: string) =>
+    request<QuestionarioSalvo | null>(`/pacientes/${pacienteId}/questionario`),
+
+  // ---- Agendamento pelo agente ----
+  solicitarConsulta: (prefs: {
+    tipo?: PreferenciaTipo | null;
+    periodos?: Periodo[] | null;
+    cidade?: string | null;
+    bairro?: string | null;
+  }) => request<ResultadoAgendamento>("/agendamento/solicitar", { method: "POST", body: JSON.stringify(prefs) }),
+
+  responderPresenca: (consultaId: string, acao: "confirmar" | "remarcar") =>
+    request<ResultadoAgendamento>(`/agendamento/consultas/${consultaId}/presenca`, {
+      method: "POST",
+      body: JSON.stringify({ acao }),
+    }),
+
+  meuPerfilPaciente: () => request<PacientePerfil>("/usuarios/me/paciente-perfil"),
+
+  minhaNutricionista: () => request<{ id: string; nome_completo: string } | null>("/usuarios/me/nutricionista"),
+
+  // ---- Notificações ----
+  notificacoes: () => request<{ nao_lidas: number; itens: Notificacao[] }>("/notificacoes"),
+
+  marcarNotificacaoLida: (id: string) => requestSemCorpo(`/notificacoes/${id}/lida`, { method: "POST" }),
+
+  marcarTodasLidas: () => requestSemCorpo("/notificacoes/marcar-todas", { method: "POST" }),
+
+  // ---- Atendimento da nutricionista ----
+  minhaDisponibilidade: () => request<JanelaDisponibilidade[]>("/usuarios/me/disponibilidade"),
+
+  definirDisponibilidade: (janelas: JanelaDisponibilidade[]) =>
+    request<JanelaDisponibilidade[]>("/usuarios/me/disponibilidade", { method: "PUT", body: JSON.stringify(janelas) }),
+
+  catalogoDeAlimentos: () => request<AlimentoCatalogo[]>("/alimentos"),
+
+  registrarRefeicaoPorItens: (dados: { nome?: string | null; itens: { alimento_id: string; gramas: number }[] }) =>
+    request<RegistroAlimentar>("/registros-alimentares/itens", { method: "POST", body: JSON.stringify(dados) }),
 
   registrarRefeicao: (dados: NovaRefeicao) =>
     request<RegistroAlimentar>("/registros-alimentares/manual", { method: "POST", body: JSON.stringify(dados) }),

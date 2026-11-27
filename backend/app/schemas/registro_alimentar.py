@@ -48,3 +48,32 @@ class ResumoMacrosDiario(BaseModel):
     meta_proteina_g: float | None
     meta_carboidratos_g: float | None
     meta_gordura_g: float | None
+
+
+class MedidaCaseira(BaseModel):
+    nome: str
+    gramas: float
+
+
+class AlimentoCatalogo(BaseModel):
+    """Alimento com valores por 100 g, para o paciente montar a refeição."""
+    id: str
+    nome: str
+    grupo: str
+    kcal: float
+    proteina: float
+    carboidrato: float
+    gordura: float
+    medidas: list[MedidaCaseira]
+    fonte: str
+
+
+class ItemRefeicao(BaseModel):
+    alimento_id: str
+    gramas: float = Field(gt=0, le=3000)
+
+
+class RegistroPorItensCriar(BaseModel):
+    """Refeição montada a partir de alimentos e quantidades; os macros são calculados pela API."""
+    nome: str | None = Field(default=None, max_length=60)  # ex.: "Almoço"
+    itens: list[ItemRefeicao] = Field(min_length=1, max_length=30)

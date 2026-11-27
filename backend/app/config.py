@@ -21,6 +21,11 @@ class Settings(BaseSettings):
     access_token_expire_minutes: int = 60 * 24  # 24h
 
     # Armazenamento de arquivos (fotos de refeição, exames, etc.)
+    # Fuso dos horários de atendimento (disponibilidade das nutricionistas)
+    fuso_horario: str = "America/Sao_Paulo"
+    # Envia os lembretes da véspera numa tarefa periódica (desligado nos testes)
+    lembretes_automaticos: bool = True
+
     upload_dir: str = "./uploads"
     max_upload_size_mb: int = 10
 

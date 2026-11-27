@@ -10,6 +10,7 @@ from app.schemas.tipos import DataHoraUTC
 class PlanoAlimentarCriar(BaseModel):
     nome: str = Field(max_length=100)
     horario: str = Field(max_length=20)
+    dia_semana: int | None = Field(default=None, ge=0, le=6)  # 0 = segunda; vazio = todos os dias
     descricao: str = Field(max_length=1000)
     meta_calorias: float | None = Field(default=None, ge=0)
     meta_proteina_g: float | None = Field(default=None, ge=0)
@@ -36,7 +37,9 @@ class RotinaAlimentarLer(BaseModel):
 
     id: uuid.UUID
     paciente_id: uuid.UUID
-    nutricionista_id: uuid.UUID
+    nutricionista_id: uuid.UUID | None  # vazio quando a dieta foi gerada pelo app
+    origem: str = "nutricionista"  # "nutricionista" ou "app"
+    explicacao: str | None = None
     titulo: str
     objetivo: DietaMeta
     ativo: bool

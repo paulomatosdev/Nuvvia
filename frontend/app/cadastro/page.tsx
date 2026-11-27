@@ -44,7 +44,8 @@ export default function CadastroPage() {
       if (perfil === "nutricionista" && crn.trim()) {
         await api.atualizarPerfilNutricionista({ crn: crn.trim() });
       }
-      router.push(inicioDoPerfil(perfil));
+      // Paciente novo começa pelo questionário que monta a dieta
+      router.push(perfil === "paciente" ? "/questionario" : inicioDoPerfil(perfil));
     } catch (err) {
       setErro(err instanceof Error ? err.message : "Não foi possível criar a conta");
     } finally {

@@ -1,6 +1,8 @@
 import uuid
 from datetime import date
 
+from typing import Literal
+
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 from app.models.usuario import PerfilAcesso
@@ -35,17 +37,29 @@ class PacientePerfilAtualizar(BaseModel):
     meta_diaria_proteina_g: float | None = Field(default=None, ge=0)
     meta_diaria_carboidratos_g: float | None = Field(default=None, ge=0)
     meta_diaria_gordura_g: float | None = Field(default=None, ge=0)
+    # Preferências para o agente de agendamento
+    cidade: str | None = Field(default=None, max_length=80)
+    bairro: str | None = Field(default=None, max_length=80)
+    preferencia_tipo: Literal["online", "pessoal", "tanto_faz"] | None = None
+    preferencia_periodos: list[Literal["manha", "tarde", "noite"]] | None = None
 
 
 class PacientePerfilLer(PacientePerfilAtualizar):
     model_config = ConfigDict(from_attributes=True)
     id: uuid.UUID
     usuario_id: uuid.UUID
+    nutricionista_id: uuid.UUID | None = None  # quem acompanha (após a 1ª consulta)
 
 
 class NutricionistaPerfilAtualizar(BaseModel):
     crn: str | None = Field(default=None, max_length=50)
     bio: str | None = Field(default=None, max_length=1000)
+    cidade: str | None = Field(default=None, max_length=80)
+    bairro: str | None = Field(default=None, max_length=80)
+    endereco: str | None = Field(default=None, max_length=255)
+    atende_online: bool | None = None
+    atende_presencial: bool | None = None
+    duracao_consulta_min: int | None = Field(default=None, ge=15, le=180)
 
 
 class NutricionistaPerfilLer(NutricionistaPerfilAtualizar):
